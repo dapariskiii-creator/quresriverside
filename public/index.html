@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Qures Riverside — Coffee</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+    </head>
+<body>
+    <header class="hero">
+        <nav>
+            <a class="brand" href="#">
+                <span class="q">Q</span>
+                <span>quresriverside</span>
+            </a>
+        <a class="cashier" href="/kasir">Kasir ↗</a>
+    </nav>
+<div class="hero-grid">
+    <div>
+        <small>COFFEE • FOOD • RIVERSIDE</small>
+        <h1>Nikmati kopi,<br>
+            <i>rasakan suasananya.</i>
+        </h1>
+    <p>Kopi, snack dan makanan pilihan untuk menemani waktu santaimu.</p>
+    <a class="btn light" href="#menu">Lihat Menu</a>
+</div>
+<div class="hero-logo">
+    <img src="logo-quresriverside.jpeg" alt="Logo Qures Riverside">
+</div>
+</div>
+</header>
+<main id="menu">
+    <div class="head">
+        <div>
+            <small>OUR MENU</small>
+            <h2>Menu Qures Riverside</h2>
+        </div>
+    <div class="filters">
+        <button class="active" data-cat="all">Semua</button>
+        <button data-cat="minuman">Minuman</button>
+        <button data-cat="snack">Snack</button>
+        <button data-cat="makanan">Makanan</button>
+    </div>
+</div>
+<div id="grid" class="grid">
+</div>
+</main>
+<section class="cart-section">
+    <div class="cart">
+        <small>YOUR ORDER</small>
+        <h2>Pesananmu</h2>
+        <div id="cart">
+        </div>
+    <div class="total">
+        <span>Total</span>
+        <b id="total">Rp0</b>
+    </div>
+<button id="checkoutBtn" class="btn dark full">Pesan Sekarang</button>
+</div>
+</section>
+<div id="modal" class="modal hidden">
+    <div class="modal-card">
+        <button class="x" id="close">×</button>
+        <small>CHECKOUT</small>
+        <h2>Konfirmasi Pesanan</h2>
+        <form id="form">
+            <label>Nama pelanggan<input id="customer" required placeholder="Nama kamu">
+            </label>
+        <label>Nomor meja<input id="table" placeholder="Contoh: 08">
+        </label>
+    <div id="summary" class="summary">
+    </div>
+<button class="btn dark full">Kirim ke Kasir</button>
+</form>
+<div id="success" class="success hidden">
+</div>
+</div>
+</div>
+<footer>
+    <b>quresriverside</b>
+    <span>coffee • food • riverside</span>
+    <a href="/kasir">Dashboard Kasir</a>
+</footer>
+<script src="app.js">
+</script>
+</body>
+</html>

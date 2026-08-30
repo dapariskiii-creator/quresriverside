@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Qures Riverside</title>
+    <link rel="stylesheet" href="/admin.css">
+</head>
+
+<body>
+
+<header>
+    <div>
+        <h1>Qures Riverside</h1>
+        <p>Panel Admin</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="/" class="btn secondary">Website</a>
+        <button id="logoutBtn" class="btn danger">Logout</button>
+    </div>
+</header>
+
+<main>
+
+    <section class="panel">
+        <div class="panel-title">
+            <div>
+                <h2 id="formTitle">Tambah Menu</h2>
+                <p>Kelola menu, harga dan stok.</p>
+            </div>
+        </div>
+
+        <form id="menuForm">
+
+            <input type="hidden" id="menuId">
+
+            <div class="form-grid">
+
+                <div>
+                    <label>Nama Menu</label>
+                    <input
+                        type="text"
+                        id="name"
+                        placeholder="Contoh: Kopi Susu Riverside"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label>Kategori</label>
+                    <select id="category" required>
+                        <option value="">Pilih kategori</option>
+                        <option value="minuman">Minuman</option>
+                        <option value="snack">Snack</option>
+                        <option value="makanan">Makanan</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Harga</label>
+                    <input
+                        type="number"
+                        id="price"
+                        placeholder="15000"
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label>Stok</label>
+                    <input
+                        type="number"
+                        id="stock"
+                        placeholder="50"
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <div class="full">
+                    <label>Deskripsi</label>
+                    <textarea
+                        id="description"
+                        placeholder="Deskripsi menu..."
+                    ></textarea>
+                </div>
+
+                <div class="full">
+                    <label>URL / lokasi gambar</label>
+                    <input
+                        type="text"
+                        id="image_url"
+                        placeholder="/images/kopi-susu.jpg"
+                    >
+                    <small>
+                        Contoh: /images/kopi-susu.jpg
+                    </small>
+                </div>
+
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" class="btn primary" id="saveBtn">
+                    Simpan Menu
+                </button>
+
+                <button
+                    type="button"
+                    class="btn secondary hidden"
+                    id="cancelBtn"
+                >
+                    Batal Edit
+                </button>
+            </div>
+
+        </form>
+    </section>
+
+
+    <section class="panel">
+
+        <div class="panel-title">
+            <div>
+                <h2>Daftar Menu</h2>
+                <p>Menu yang tersimpan di database.</p>
+            </div>
+
+            <button class="btn secondary" onclick="loadMenu()">
+                ↻ Refresh
+            </button>
+        </div>
+
+        <div id="menuList" class="menu-list">
+            Memuat menu...
+        </div>
+
+    </section>
+
+</main>
+
+<script src="/admin.js"></script>
+
+</body>
+</html>
