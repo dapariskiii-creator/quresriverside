@@ -1,8 +1,6 @@
 runtime:
   image: node:20
 
-build:
-  command: npm install
-
-start:
-  command: node server.js
+commands:
+  build: npm install
+  start: node server.js
