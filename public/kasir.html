@@ -1,126 +1,563 @@
+```html
 <!doctype html>
 <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>Kasir — Qures Riverside</title>
-        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="kasir.css">
-    </head>
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Kasir — Qures Riverside</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="kasir.css"
+    >
+</head>
+
+
 <body>
+
+    <!-- ========================= -->
+    <!-- LOGIN -->
+    <!-- ========================= -->
+
     <div id="login" class="login">
+
         <div class="login-card">
-            <div class=logo>quresriverside</div>
-            <p>LOGIN KASIR</p>
-            <form id=loginForm>
-                <input id=user autocomplete=username placeholder="Username" required>
-                <input id=pass autocomplete=current-password type=password placeholder="Password" required>
-                <button>Masuk</button>
+
+            <div class="logo">
+                quresriverside
+            </div>
+
+            <p>
+                LOGIN KASIR
+            </p>
+
+
+            <form id="loginForm">
+
+                <input
+                    id="user"
+                    autocomplete="username"
+                    placeholder="Username"
+                    required
+                >
+
+
+                <input
+                    id="pass"
+                    autocomplete="current-password"
+                    type="password"
+                    placeholder="Password"
+                    required
+                >
+
+
+                <button type="submit">
+                    Masuk
+                </button>
+
             </form>
-        <small>Default demo: <b>admin</b> / <b>admin123</b>
-        </small>
-    <div id=loginError class=error>
+
+
+            <small>
+                Default demo:
+                <b>admin</b> /
+                <b>admin123</b>
+            </small>
+
+
+            <div
+                id="loginError"
+                class="error"
+            ></div>
+
+        </div>
+
     </div>
-</div>
-</div>
-<div id=app class=hidden>
-    <header>
-        <div>
-            <b>quresriverside</b>
-            <small>Dashboard Kasir</small>
-        </div>
-    <div>
-        <a href="/">Website</a>
-        <button onclick=logout()>Keluar</button>
+
+
+
+    <!-- ========================= -->
+    <!-- DASHBOARD -->
+    <!-- ========================= -->
+
+    <div
+        id="app"
+        class="hidden"
+    >
+
+
+        <!-- HEADER -->
+
+        <header>
+
+            <div>
+
+                <b>
+                    quresriverside
+                </b>
+
+                <small>
+                    Dashboard Kasir
+                </small>
+
+            </div>
+
+
+            <div>
+
+                <a href="/">
+                    Website
+                </a>
+
+
+                <button
+                    type="button"
+                    onclick="logout()"
+                >
+                    Keluar
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ========================= -->
+        <!-- MAIN -->
+        <!-- ========================= -->
+
+        <main>
+
+
+            <!-- STATISTIK -->
+
+            <div class="stats">
+
+
+                <div>
+
+                    <small>
+                        PESANAN BARU
+                    </small>
+
+                    <b id="n">
+                        0
+                    </b>
+
+                </div>
+
+
+                <div>
+
+                    <small>
+                        DIPROSES
+                    </small>
+
+                    <b id="p">
+                        0
+                    </b>
+
+                </div>
+
+
+                <div>
+
+                    <small>
+                        SELESAI
+                    </small>
+
+                    <b id="d">
+                        0
+                    </b>
+
+                </div>
+
+
+                <div>
+
+                    <small>
+                        OMZET
+                    </small>
+
+                    <b id="rev">
+                        Rp0
+                    </b>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ========================= -->
+            <!-- TAB -->
+            <!-- ========================= -->
+
+            <div class="tabs">
+
+                <button
+                    type="button"
+                    class="tab active"
+                    onclick="showTab('orders', this)"
+                >
+                    Pesanan
+                </button>
+
+
+                <button
+                    type="button"
+                    class="tab"
+                    onclick="showTab('menu', this)"
+                >
+                    Menu
+                </button>
+
+
+                <button
+                    type="button"
+                    class="tab"
+                    onclick="showTab('report', this)"
+                >
+                    Laporan
+                </button>
+
+            </div>
+
+
+
+            <!-- ========================= -->
+            <!-- PESANAN -->
+            <!-- ========================= -->
+
+            <section id="orders">
+
+                <div class="bar">
+
+                    <div>
+
+                        <small>
+                            ORDER MANAGEMENT
+                        </small>
+
+                        <h1>
+                            Pesanan Masuk
+                        </h1>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        onclick="loadOrders()"
+                    >
+                        ↻ Refresh
+                    </button>
+
+                </div>
+
+
+                <div id="orderList"></div>
+
+            </section>
+
+
+
+            <!-- ========================= -->
+            <!-- MENU -->
+            <!-- ========================= -->
+
+            <section
+                id="menu"
+                class="hidden"
+            >
+
+                <div class="bar">
+
+                    <div>
+
+                        <small>
+                            MENU MANAGEMENT
+                        </small>
+
+                        <h1>
+                            Kelola Menu
+                        </h1>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        onclick="openMenu()"
+                    >
+                        + Menu Baru
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="menuList"
+                    class="menu-grid"
+                ></div>
+
+            </section>
+
+
+
+            <!-- ========================= -->
+            <!-- LAPORAN -->
+            <!-- ========================= -->
+
+            <section
+                id="report"
+                class="hidden"
+            >
+
+                <div class="bar">
+
+                    <div>
+
+                        <small>
+                            SALES REPORT
+                        </small>
+
+                        <h1>
+                            Laporan Hari Ini
+                        </h1>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        onclick="loadReport()"
+                    >
+                        ↻ Refresh
+                    </button>
+
+                </div>
+
+
+                <div id="reportBox"></div>
+
+            </section>
+
+
+        </main>
+
     </div>
-</header>
-<main>
-    <div class=stats>
-        <div>
-            <small>PESANAN BARU</small>
-            <b id=n>0</b>
+
+
+
+    <!-- ========================= -->
+    <!-- MODAL TAMBAH / EDIT MENU -->
+    <!-- ========================= -->
+
+    <div
+        id="menuModal"
+        class="modal hidden"
+    >
+
+        <div class="modal-card">
+
+
+            <!-- TOMBOL CLOSE -->
+
+            <button
+                type="button"
+                class="x"
+                onclick="closeMenu()"
+            >
+                ×
+            </button>
+
+
+            <h2>
+                Menu
+            </h2>
+
+
+            <form id="menuForm">
+
+
+                <!-- ID MENU -->
+
+                <input
+                    type="hidden"
+                    id="mid"
+                >
+
+
+
+                <!-- NAMA -->
+
+                <label>
+
+                    Nama
+
+                    <input
+                        id="mn"
+                        type="text"
+                        placeholder="Contoh: Kopi Susu Riverside"
+                        required
+                    >
+
+                </label>
+
+
+
+                <!-- KATEGORI -->
+
+                <label>
+
+                    Kategori
+
+                    <select id="mc">
+
+                        <option value="minuman">
+                            Minuman
+                        </option>
+
+                        <option value="snack">
+                            Snack
+                        </option>
+
+                        <option value="makanan">
+                            Makanan
+                        </option>
+
+                    </select>
+
+                </label>
+
+
+
+                <!-- HARGA -->
+
+                <label>
+
+                    Harga
+
+                    <input
+                        id="mp"
+                        type="number"
+                        min="0"
+                        placeholder="18000"
+                        required
+                    >
+
+                </label>
+
+
+
+                <!-- STOK -->
+
+                <label>
+
+                    Stok
+
+                    <input
+                        id="ms"
+                        type="number"
+                        min="0"
+                        placeholder="50"
+                        required
+                    >
+
+                </label>
+
+
+
+                <!-- DESKRIPSI -->
+
+                <label>
+
+                    Deskripsi
+
+                    <textarea
+                        id="md"
+                        placeholder="Deskripsi menu..."
+                    ></textarea>
+
+                </label>
+
+
+
+                <!-- ========================= -->
+                <!-- FOTO MENU -->
+                <!-- ========================= -->
+
+                <label>
+
+                    Foto Menu
+
+                    <input
+                        id="imageFile"
+                        type="file"
+                        accept="image/*"
+                    >
+
+                </label>
+
+
+
+                <!-- URL FOTO DISIMPAN OTOMATIS -->
+
+                <input
+                    id="mi"
+                    type="hidden"
+                >
+
+
+
+                <!-- PREVIEW FOTO -->
+
+                <div
+                    id="imagePreview"
+                    class="image-preview"
+                ></div>
+
+
+
+                <!-- SIMPAN -->
+
+                <button
+                    type="submit"
+                    class="save"
+                >
+                    Simpan
+                </button>
+
+
+            </form>
+
         </div>
-    <div>
-        <small>DIPROSES</small>
-        <b id=p>0</b>
+
     </div>
-<div>
-    <small>SELESAI</small>
-    <b id=d>0</b>
-</div>
-<div>
-    <small>OMZET</small>
-    <b id=rev>Rp0</b>
-</div>
-</div>
-<div class=tabs>
-    <button class="tab active" onclick="showTab('orders',this)">Pesanan</button>
-    <button class=tab onclick="showTab('menu',this)">Menu</button>
-    <button class=tab onclick="showTab('report',this)">Laporan</button>
-</div>
-<section id=orders>
-    <div class=bar>
-        <div>
-            <small>ORDER MANAGEMENT</small>
-            <h1>Pesanan Masuk</h1>
-        </div>
-    <button onclick=loadOrders()>↻ Refresh</button>
-</div>
-<div id=orderList>
-</div>
-</section>
-<section id=menu class=hidden>
-    <div class=bar>
-        <div>
-            <small>MENU MANAGEMENT</small>
-            <h1>Kelola Menu</h1>
-        </div>
-    <button onclick="openMenu()">+ Menu Baru</button>
-</div>
-<div id=menuList class=menu-grid>
-</div>
-</section>
-<section id=report class=hidden>
-    <div class=bar>
-        <div>
-            <small>SALES REPORT</small>
-            <h1>Laporan Hari Ini</h1>
-        </div>
-    <button onclick=loadReport()>↻ Refresh</button>
-</div>
-<div id=reportBox>
-</div>
-</section>
-</main>
-</div>
-<div id=menuModal class="modal hidden">
-    <div class=modal-card>
-        <button class=x onclick=closeMenu()>×</button>
-        <h2>Menu</h2>
-        <form id=menuForm>
-            <input type=hidden id=mid>
-            <label>Nama<input id=mn required>
-            </label>
-        <label>Kategori<select id=mc>
-                <option value=minuman>Minuman</option>
-                <option value=snack>Snack</option>
-                <option value=makanan>Makanan</option>
-            </select>
-    </label>
-<label>Harga<input id=mp type=number required>
-</label>
-<label>Stok<input id=ms type=number required>
-</label>
-<label>Deskripsi<textarea id=md>
-    </textarea>
-</label>
-<label>URL gambar<input id=mi placeholder="https://...">
-</label>
-<button class=save>Simpan</button>
-</form>
-</div>
-</div>
-<script src=kasir.js>
-</script>
+
+
+
+    <!-- ========================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ========================= -->
+
+    <script src="kasir.js"></script>
+
 </body>
+
 </html>
+```
