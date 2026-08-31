@@ -1,7 +1,15 @@
+```json
 {
   "name": "quresriverside-mysql-online",
   "version": "3.0.0",
   "private": true,
+  "description": "Qures Riverside website dengan Node.js, Express, dan MySQL Aiven.",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": "20.x",
+    "npm": ">=10"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
@@ -13,19 +21,14 @@
     "express-session": "^1.18.1",
     "mysql2": "^3.12.0"
   },
-  "description": "Versi ini diperbaiki khusus karena: 1. Menu sekarang punya GAMBAR demo, bukan hanya tulisan. 2. Ada 3 Minuman + 3 Snack + 3 Makanan. 3. Login admin/kasir menggunakan bcrypt dan database MySQL. 4. Password tidak disimpan sebagai password biasa. 5. Order pelanggan masuk ke MySQL. 6. Stok berkurang otomatis. 7. Dashboard kasir menerima order secara otomatis setiap 5 detik. 8. Ada kelola menu, stok, harga, gambar, dan laporan.",
-  "main": "server.js",
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dapariskiii-creator/quresriverside.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/dapariskiii-creator/quresriverside/issues"
-  },
-  "homepage": "https://github.com/dapariskiii-creator/quresriverside#readme"
+  "keywords": [
+    "quresriverside",
+    "coffee",
+    "nodejs",
+    "express",
+    "mysql"
+  ],
+  "author": "dapariskiii-creator",
+  "license": "ISC"
 }
+```
