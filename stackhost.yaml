@@ -1,6 +1,5 @@
 runtime:
-  type: node
-  version: "20"
+  image: node:20
 
 build:
   command: npm install
