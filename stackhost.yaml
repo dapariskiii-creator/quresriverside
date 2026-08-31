@@ -1,7 +1,12 @@
 runtime:
-  image: node:20
+  image: node:22
 
 commands:
+  package: ""
   build:
-    - npm install
-  start: npm start
+    - "npm install"
+  start: "npm run start"
+
+repository:
+  branch: main
+  auto_deploy: true
