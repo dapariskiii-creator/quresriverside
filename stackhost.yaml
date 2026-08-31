@@ -1,3 +1,7 @@
+runtime:
+  type: node
+  version: "20"
+
 build:
   command: npm install
 
