@@ -1,4 +1,3 @@
-
 {
   "name": "quresriverside-mysql-online",
   "version": "3.0.0",
@@ -6,10 +5,6 @@
   "description": "Qures Riverside website dengan Node.js, Express, dan MySQL Aiven.",
   "main": "server.js",
   "type": "commonjs",
-  "engines": {
-    "node": "20.x",
-    "npm": ">=10"
-  },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
@@ -31,4 +26,3 @@
   "author": "dapariskiii-creator",
   "license": "ISC"
 }
-
