@@ -1,16 +1,17 @@
 let menu = [];
 let cart = {};
+let isSubmittingOrder = false;
 
-const rupiah = (number) => {
+function rupiah(number) {
     return new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
         maximumFractionDigits: 0
-    }).format(number);
-};
+    }).format(Number(number) || 0);
+}
 
-const escapeHtml = (text) => {
-    return String(text).replace(/[&<>"']/g, (char) => {
+function escapeHtml(text) {
+    return String(text || "").replace(/[&<>"']/g, function (char) {
         const entities = {
             "&": "&amp;",
             "<": "&lt;",
@@ -21,204 +22,664 @@ const escapeHtml = (text) => {
 
         return entities[char];
     });
-};
+}
 
 async function loadMenu() {
-    const response = await fetch("/api/menu");
-    menu = await response.json();
+    try {
+        const response = await fetch("/api/menu");
 
-    renderMenu("all");
-    renderCart();
+        if (!response.ok) {
+            throw new Error("Gagal mengambil menu.");
+        }
+
+        menu = await response.json();
+
+        renderMenu(getActiveCategory());
+        renderCart();
+        updateFloatingCart();
+
+    } catch (error) {
+        console.error("LOAD MENU ERROR:", error);
+
+        const grid = document.getElementById("grid");
+
+        if (grid) {
+            grid.innerHTML = `
+                <p style="padding:20px;">
+                    Menu gagal dimuat. Silakan refresh halaman.
+                </p>
+            `;
+        }
+    }
+}
+
+function getActiveCategory() {
+    const activeButton = document.querySelector(
+        ".filters button.active"
+    );
+
+    return activeButton
+        ? activeButton.dataset.cat
+        : "all";
+}
+
+function getCartQuantity(menuId) {
+    return Number(cart[menuId] || 0);
+}
+
+function getRemainingStock(item) {
+    const stock = Number(item.stock || 0);
+    const ordered = getCartQuantity(item.id);
+
+    return Math.max(0, stock - ordered);
 }
 
 function renderMenu(category) {
     const grid = document.getElementById("grid");
 
+    if (!grid) {
+        return;
+    }
+
     const filteredMenu =
         category === "all"
             ? menu
-            : menu.filter((item) => item.category === category);
+            : menu.filter(function (item) {
+                return item.category === category;
+            });
 
-    grid.innerHTML = filteredMenu.map((item) => {
+    if (filteredMenu.length === 0) {
+        grid.innerHTML = `
+            <p style="padding:20px;color:#718076;">
+                Belum ada menu.
+            </p>
+        `;
+
+        return;
+    }
+
+    grid.innerHTML = filteredMenu.map(function (item) {
+
+        const quantity = getCartQuantity(item.id);
+        const remaining = getRemainingStock(item);
+
+        let imageHtml = "";
+
+        if (item.image_url) {
+            imageHtml = `
+                <img
+                    src="${escapeHtml(item.image_url)}"
+                    alt="${escapeHtml(item.name)}"
+                    class="menu-image"
+                    onerror="this.style.display='none';"
+                >
+            `;
+        } else {
+            imageHtml = `
+                <div class="no-image">
+                    ☕
+                </div>
+            `;
+        }
+
+        let buttonHtml = "";
+
+        if (quantity > 0) {
+            buttonHtml = `
+                <div class="product-qty">
+
+                    <button
+                        type="button"
+                        onclick="changeQuantity(${Number(item.id)}, -1)"
+                    >
+                        −
+                    </button>
+
+                    <strong>
+                        ${quantity}
+                    </strong>
+
+                    <button
+                        type="button"
+                        onclick="changeQuantity(${Number(item.id)}, 1)"
+                        ${remaining <= 0 ? "disabled" : ""}
+                    >
+                        +
+                    </button>
+
+                </div>
+            `;
+        } else {
+            buttonHtml = `
+                <button
+                    type="button"
+                    class="add"
+                    onclick="addToCart(${Number(item.id)})"
+                    ${remaining <= 0 ? "disabled" : ""}
+                >
+                    ${remaining <= 0 ? "Habis" : "+ Tambah Pesanan"}
+                </button>
+            `;
+        }
+
         return `
             <article class="card">
+
                 <div class="photo">
-                    <img
-                        src="${escapeHtml(item.image_url || "")}"
-                        alt="${escapeHtml(item.name)}"
-                        onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'display:grid;place-items:center;height:100%;font-size:55px;color:#155d2a\\'>☕</div>'"
-                    >
+                    ${imageHtml}
                 </div>
 
                 <div class="info">
-                    <h3>${escapeHtml(item.name)}</h3>
 
-                    <p>${escapeHtml(item.description)}</p>
+                    <h3>
+                        ${escapeHtml(item.name)}
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(item.description)}
+                    </p>
 
                     <div class="price">
                         ${rupiah(item.price)}
                     </div>
 
                     <div class="stock">
-                        Stok: ${item.stock}
+                        Stok: ${remaining}
                     </div>
 
-                    <button
-                        class="add"
-                        ${item.stock < 1 ? "disabled" : ""}
-                        onclick="addToCart(${item.id})"
-                    >
-                        ${item.stock < 1 ? "Habis" : "+ Tambah Pesanan"}
-                    </button>
+                    ${buttonHtml}
+
                 </div>
+
             </article>
         `;
     }).join("");
 }
 
 function addToCart(menuId) {
-    cart[menuId] = (cart[menuId] || 0) + 1;
+    const item = menu.find(function (menuItem) {
+        return Number(menuItem.id) === Number(menuId);
+    });
+
+    if (!item) {
+        return;
+    }
+
+    const currentQuantity = getCartQuantity(menuId);
+    const stock = Number(item.stock || 0);
+
+    if (currentQuantity >= stock) {
+        alert("Stok menu ini sudah habis.");
+        return;
+    }
+
+    cart[menuId] = currentQuantity + 1;
+
+    renderMenu(getActiveCategory());
     renderCart();
+    updateFloatingCart();
 }
 
 function changeQuantity(menuId, amount) {
-    cart[menuId] = (cart[menuId] || 0) + amount;
+    const item = menu.find(function (menuItem) {
+        return Number(menuItem.id) === Number(menuId);
+    });
 
-    if (cart[menuId] <= 0) {
-        delete cart[menuId];
+    if (!item) {
+        return;
     }
 
+    const currentQuantity = getCartQuantity(menuId);
+    const newQuantity = currentQuantity + Number(amount);
+
+    if (newQuantity <= 0) {
+        delete cart[menuId];
+    } else if (newQuantity <= Number(item.stock)) {
+        cart[menuId] = newQuantity;
+    } else {
+        alert("Jumlah melebihi stok.");
+        return;
+    }
+
+    renderMenu(getActiveCategory());
     renderCart();
+    updateFloatingCart();
+}
+
+function calculateTotal() {
+    let total = 0;
+
+    Object.entries(cart).forEach(function (entry) {
+
+        const id = entry[0];
+        const quantity = Number(entry[1]);
+
+        const item = menu.find(function (menuItem) {
+            return Number(menuItem.id) === Number(id);
+        });
+
+        if (item) {
+            total += Number(item.price) * quantity;
+        }
+    });
+
+    return total;
+}
+
+function getTotalItems() {
+    let total = 0;
+
+    Object.values(cart).forEach(function (quantity) {
+        total += Number(quantity);
+    });
+
+    return total;
 }
 
 function renderCart() {
     const cartElement = document.getElementById("cart");
     const totalElement = document.getElementById("total");
 
+    if (!cartElement || !totalElement) {
+        return;
+    }
+
     const entries = Object.entries(cart);
 
     if (entries.length === 0) {
+
         cartElement.innerHTML = `
-            <p style="color:#718076">
+            <p style="color:#718076;">
                 Belum ada pesanan. Pilih menu di atas ☕
             </p>
         `;
 
         totalElement.textContent = rupiah(0);
+
         return;
     }
 
-    let total = 0;
+    cartElement.innerHTML = entries.map(function (entry) {
 
-    cartElement.innerHTML = entries.map(([id, quantity]) => {
-        const item = menu.find((menuItem) => menuItem.id == id);
+        const id = entry[0];
+        const quantity = Number(entry[1]);
+
+        const item = menu.find(function (menuItem) {
+            return Number(menuItem.id) === Number(id);
+        });
 
         if (!item) {
             return "";
         }
 
-        const subtotal = item.price * quantity;
-        total += subtotal;
+        const subtotal =
+            Number(item.price) * quantity;
+
+        const remaining =
+            getRemainingStock(item);
 
         return `
             <div class="cart-row">
-                <b>${escapeHtml(item.name)}</b>
+
+                <b>
+                    ${escapeHtml(item.name)}
+                </b>
 
                 <div class="qty">
-                    <button onclick="changeQuantity(${id}, -1)">−</button>
-                    ${quantity}
-                    <button onclick="changeQuantity(${id}, 1)">+</button>
+
+                    <button
+                        type="button"
+                        onclick="changeQuantity(${Number(id)}, -1)"
+                    >
+                        −
+                    </button>
+
+                    <span>
+                        ${quantity}
+                    </span>
+
+                    <button
+                        type="button"
+                        onclick="changeQuantity(${Number(id)}, 1)"
+                        ${remaining <= 0 ? "disabled" : ""}
+                    >
+                        +
+                    </button>
+
                 </div>
 
-                <b>${rupiah(subtotal)}</b>
+                <b>
+                    ${rupiah(subtotal)}
+                </b>
+
             </div>
         `;
     }).join("");
 
-    totalElement.textContent = rupiah(total);
+    totalElement.textContent =
+        rupiah(calculateTotal());
 }
 
-document.querySelectorAll(".filters button").forEach((button) => {
-    button.addEventListener("click", () => {
-        document.querySelectorAll(".filters button").forEach((item) => {
-            item.classList.remove("active");
-        });
+function updateFloatingCart() {
+    let floatingCart =
+        document.getElementById("floatingCart");
 
-        button.classList.add("active");
-        renderMenu(button.dataset.cat);
-    });
-});
+    const itemCount =
+        getTotalItems();
 
-document.getElementById("checkoutBtn").addEventListener("click", () => {
-    if (Object.keys(cart).length === 0) {
+    const total =
+        calculateTotal();
+
+    if (itemCount === 0) {
+
+        if (floatingCart) {
+            floatingCart.remove();
+        }
+
+        return;
+    }
+
+    if (!floatingCart) {
+
+        floatingCart =
+            document.createElement("div");
+
+        floatingCart.id =
+            "floatingCart";
+
+        document.body.appendChild(
+            floatingCart
+        );
+    }
+
+    floatingCart.innerHTML = `
+        <div class="floating-cart-info">
+
+            <div class="floating-cart-icon">
+                🛒
+            </div>
+
+            <div>
+                <strong>
+                    ${itemCount} item
+                </strong>
+
+                <small>
+                    ${rupiah(total)}
+                </small>
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="floating-checkout"
+            onclick="openCheckout()"
+        >
+            Kirim ke Kasir
+        </button>
+    `;
+}
+
+function openCheckout() {
+    if (getTotalItems() === 0) {
         alert("Pilih menu dulu.");
         return;
     }
 
-    const summary = document.getElementById("summary");
+    const summary =
+        document.getElementById("summary");
 
-    summary.innerHTML = Object.entries(cart).map(([id, quantity]) => {
-        const item = menu.find((menuItem) => menuItem.id == id);
+    const modal =
+        document.getElementById("modal");
 
-        return `
-            ${quantity} × ${escapeHtml(item.name)}
-            — <b>${rupiah(item.price * quantity)}</b>
-        `;
-    }).join("<br>") + `
-        <hr>
-        <b>Total ${document.getElementById("total").textContent}</b>
-    `;
-
-    document.getElementById("modal").classList.remove("hidden");
-});
-
-document.getElementById("close").addEventListener("click", () => {
-    document.getElementById("modal").classList.add("hidden");
-});
-
-document.getElementById("form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const items = Object.entries(cart).map(([menuId, quantity]) => {
-        return {
-            menu_id: Number(menuId),
-            qty: quantity
-        };
-    });
-
-    const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            customer_name: document.getElementById("customer").value,
-            table_number: document.getElementById("table").value,
-            items: items
-        })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        alert(data.error || "Pesanan gagal.");
+    if (!summary || !modal) {
         return;
     }
 
-    document.getElementById("form").classList.add("hidden");
-    document.getElementById("success").classList.remove("hidden");
+    summary.innerHTML =
+        Object.entries(cart).map(function (entry) {
 
-    document.getElementById("success").innerHTML = `
-        <b>Pesanan #${data.order_id} berhasil!</b>
-        <br>
-        Total: ${rupiah(data.total)}
-        <br>
-        Pesanan sudah masuk ke kasir.
-    `;
+            const id = entry[0];
+            const quantity = Number(entry[1]);
 
-    cart = {};
-    renderCart();
-    await loadMenu();
-});
+            const item = menu.find(function (menuItem) {
+                return Number(menuItem.id) === Number(id);
+            });
+
+            if (!item) {
+                return "";
+            }
+
+            return `
+                ${quantity} ×
+                ${escapeHtml(item.name)}
+                —
+                <b>
+                    ${rupiah(
+                        Number(item.price) * quantity
+                    )}
+                </b>
+            `;
+        }).join("<br>") +
+        `
+            <hr>
+            <b>
+                Total ${rupiah(calculateTotal())}
+            </b>
+        `;
+
+    modal.classList.remove("hidden");
+}
+
+function closeCheckout() {
+    const modal =
+        document.getElementById("modal");
+
+    if (modal) {
+        modal.classList.add("hidden");
+    }
+}
+
+document
+    .querySelectorAll(".filters button")
+    .forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            document
+                .querySelectorAll(".filters button")
+                .forEach(function (item) {
+                    item.classList.remove("active");
+                });
+
+            button.classList.add("active");
+
+            renderMenu(
+                button.dataset.cat
+            );
+        });
+    });
+
+const checkoutButton =
+    document.getElementById("checkoutBtn");
+
+if (checkoutButton) {
+    checkoutButton.addEventListener(
+        "click",
+        openCheckout
+    );
+}
+
+const closeButton =
+    document.getElementById("close");
+
+if (closeButton) {
+    closeButton.addEventListener(
+        "click",
+        closeCheckout
+    );
+}
+
+const form =
+    document.getElementById("form");
+
+if (form) {
+
+    form.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            if (isSubmittingOrder) {
+                return;
+            }
+
+            if (getTotalItems() === 0) {
+                alert("Pilih menu dulu.");
+                return;
+            }
+
+            const customerInput =
+                document.getElementById("customer");
+
+            const tableInput =
+                document.getElementById("table");
+
+            const customer =
+                customerInput.value.trim();
+
+            const table =
+                tableInput.value.trim();
+
+            if (!customer) {
+                alert("Nama pelanggan wajib diisi.");
+                customerInput.focus();
+                return;
+            }
+
+            const items =
+                Object.entries(cart).map(
+                    function (entry) {
+                        return {
+                            menu_id:
+                                Number(entry[0]),
+
+                            qty:
+                                Number(entry[1])
+                        };
+                    }
+                );
+
+            isSubmittingOrder = true;
+
+            const submitButton =
+                form.querySelector(
+                    'button[type="submit"]'
+                );
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent =
+                    "Mengirim...";
+            }
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/orders",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                customer_name:
+                                    customer,
+
+                                table_number:
+                                    table,
+
+                                items:
+                                    items
+                            })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.error ||
+                        "Pesanan gagal."
+                    );
+                }
+
+                form.classList.add("hidden");
+
+                const success =
+                    document.getElementById(
+                        "success"
+                    );
+
+                if (success) {
+
+                    success.classList.remove(
+                        "hidden"
+                    );
+
+                    success.innerHTML = `
+                        <b>
+                            Pesanan #${data.order_id}
+                            berhasil!
+                        </b>
+
+                        <br>
+
+                        Total:
+                        ${rupiah(data.total)}
+
+                        <br>
+
+                        Pesanan sudah masuk ke kasir.
+                    `;
+                }
+
+                cart = {};
+
+                renderCart();
+                updateFloatingCart();
+
+                await loadMenu();
+
+            } catch (error) {
+
+                console.error(
+                    "ORDER ERROR:",
+                    error
+                );
+
+                alert(
+                    error.message ||
+                    "Pesanan gagal."
+                );
+
+                isSubmittingOrder = false;
+
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent =
+                        "Kirim ke Kasir";
+                }
+            }
+        }
+    );
+}
 
 loadMenu();
