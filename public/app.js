@@ -559,6 +559,12 @@ if (form) {
                 return;
             }
 
+            if (!table) {
+                alert("Nomor meja wajib diisi.");
+                tableInput.focus();
+                return;
+            }
+
             const items =
                 Object.entries(cart).map(
                     function (entry) {
@@ -636,16 +642,25 @@ if (form) {
 
                     success.innerHTML = `
                         <b>
-                            Pesanan #${data.order_id}
-                            berhasil!
+                            Pesanan berhasil dikirim!
                         </b>
 
+                        <br><br>
+
+                        Nama:
+                        ${escapeHtml(customer)}
+
                         <br>
+
+                        Meja:
+                        ${escapeHtml(table)}
+
+                        <br><br>
 
                         Total:
                         ${rupiah(data.total)}
 
-                        <br>
+                        <br><br>
 
                         Pesanan sudah masuk ke kasir.
                     `;
