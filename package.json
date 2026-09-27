@@ -1,8 +1,8 @@
 {
-  "name": "quresriverside-mysql-online",
-  "version": "3.0.0",
+  "name": "quresriverside",
+  "version": "4.0.0",
   "private": true,
-  "description": "Qures Riverside website dengan Node.js, Express, dan MySQL Aiven.",
+  "description": "Qures Riverside website dengan Node.js, Express, PostgreSQL, dan Neon.",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
@@ -12,18 +12,20 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.11.0",
+    "connect-pg-simple": "^10.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "multer": "^2.3.0",
-    "mysql2": "^3.12.0"
+    "pg": "^8.23.0"
   },
   "keywords": [
     "quresriverside",
     "coffee",
     "nodejs",
     "express",
-    "mysql"
+    "postgresql",
+    "neon"
   ],
   "author": "dapariskiii-creator",
   "license": "ISC"

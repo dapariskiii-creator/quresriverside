@@ -1,2 +1,5 @@
 .env
 node_modules/
+inspect-neon.js
+neon-schema.txt
+update-password.js
