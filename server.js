@@ -3625,8 +3625,7 @@ app.use(
 // ======================================================
 
 async function start() {
-    const ready =
-        await setupDatabase();
+    const ready = await setupDatabase();
 
     if (!ready) {
         console.error(
@@ -3636,91 +3635,91 @@ async function start() {
         process.exit(1);
     }
 
-    const server =
-        app.listen(
-            PORT,
-            "0.0.0.0",
-            function () {
-                console.log("");
+    const server = app.listen(
+        PORT,
+        "0.0.0.0",
+        function () {
+            console.log("");
 
-                console.log(
-                    "===================================="
-                );
+            console.log(
+                "===================================="
+            );
 
-                console.log(
-                    "       QURES RIVERSIDE"
-                );
+            console.log(
+                "       QURES RIVERSIDE"
+            );
 
-                console.log(
-                    "===================================="
-                );
+            console.log(
+                "===================================="
+            );
 
-                console.log(
-                    `Server berjalan di port ${PORT}`
-                );
+            console.log(
+                `Server berjalan di port ${PORT}`
+            );
 
-                console.log(
-                    "Database : PostgreSQL / Neon"
-                );
+            console.log(
+                "Database : PostgreSQL / Neon"
+            );
 
-                console.log(
-                    "Inventory: ON"
-                );
+            console.log(
+                "Inventory: ON"
+            );
 
-                console.log(
-                    "Recipe   : ON"
-                );
+            console.log(
+                "Recipe   : ON"
+            );
 
-                console.log(
-                    "HPP      : ON"
-                );
+            console.log(
+                "HPP      : ON"
+            );
 
-                console.log(
-                    "Session  : PostgreSQL"
-                );
+            console.log(
+                "Session  : PostgreSQL"
+            );
 
-                console.log(
-                    "===================================="
-                );
-            }
+            console.log(
+                "===================================="
+            );
+        }
+    );
+
+    const shutdown = async (signal) => {
+        console.log(
+            `${signal} diterima. Menutup server...`
         );
 
-    const shutdown =
-        async (signal) => {
-            console.log(
-                `${signal} diterima. Menutup server...`
-            );
+        server.close(
+            async () => {
+                try {
+                    await pool.end();
 
-            server.close(
-                async () => {
-                    try {
-                        await pool.end();
+                    console.log(
+                        "Database pool ditutup."
+                    );
 
-                        console.log(
-                            "Database pool ditutup."
-                        );
+                    process.exit(0);
+                } catch (error) {
+                    console.error(error);
 
-                        process.exit(0);
-                    } catch (error) {
-                        console.error(error);
-
-                        process.exit(1);
-                    }
+                    process.exit(1);
                 }
-            );
-        };
+            }
+        );
+    };
 
     process.on(
         "SIGTERM",
-        () =>
-            shutdown("SIGTERM")
+        () => shutdown("SIGTERM")
     );
 
     process.on(
         "SIGINT",
-        () =>
-            shutdown("SIGINT")
+        () => shutdown("SIGINT")
     );
 }
 
-start();
+if (require.main === module) {
+    start();
+}
+
+module.exports = app;
